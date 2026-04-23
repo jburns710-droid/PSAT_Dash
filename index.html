@@ -1203,6 +1203,49 @@ body {
 
 /* ── END DECISION LAYOUT ──────────────────────────────────── */
 
+/* AI SUMMARY */
+.ai-summary-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(167,139,250,0.15));
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 7px;
+  color: var(--accent-blue);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.ai-summary-btn:hover {
+  background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(167,139,250,0.25));
+  border-color: var(--accent-blue);
+}
+.ai-summary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ai-summary-box {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+.ai-summary-box .summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-blue);
+  margin-bottom: 8px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }
@@ -1899,6 +1942,8 @@ function renderProfile(id) {
             </div>
           </div>
           <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">Selection Index: <strong style="color:var(--text-primary);font-size:16px">${s.idx}</strong> <span style="color:var(--text-muted)">(48–228)</span></div>
+          <button class="ai-summary-btn" onclick="generateSummary(${s.id})" id="summary-btn-${s.id}">✦ Generate AI Summary</button>
+          <div id="ai-summary-${s.id}" class="ai-summary-box" style="display:none"></div>
         </div>
 
         <div class="benchmark-status">
@@ -2611,6 +2656,59 @@ document.addEventListener('click', e => {
     e.target.classList.add('hidden');
   }
 });
+
+// ─── AI SUMMARY ──────────────────────────────────────────────────────────────
+async function generateSummary(id) {
+  const s = STUDENTS.find(x => x.id == id);
+  if (!s) return;
+
+  const btn = document.getElementById(`summary-btn-${id}`);
+  const box = document.getElementById(`ai-summary-${id}`);
+  if (!btn || !box) return;
+
+  const allDomains = [
+    ...DOMAINS_RW.map(d => ({key:d, label:DOMAIN_LABELS[d]})),
+    ...DOMAINS_MATH.map(d => ({key:d, label:DOMAIN_LABELS[d]}))
+  ];
+  const sorted = [...allDomains].sort((a,b) => s.domains[b.key] - s.domains[a.key]);
+  const strengths = sorted.slice(0,3).map(d => d.label);
+  const focus = sorted.slice(-3).reverse().map(d => d.label);
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  box.style.display = 'block';
+  box.innerHTML = '<div class="summary-label">AI Summary</div><div style="color:var(--text-muted);font-size:13px">Analyzing student data...</div>';
+
+  try {
+    const res = await fetch('/api/summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        student: {
+          name: s.name,
+          grade: s.grade,
+          total: s.total,
+          rw: s.rw,
+          math: s.math,
+          rwMet: s.rwMet,
+          mathMet: s.mathMet,
+          absences: s.absences,
+          strengths,
+          focus
+        }
+      })
+    });
+
+    const data = await res.json();
+    box.innerHTML = `<div class="summary-label">AI Summary</div>${data.summary}`;
+    btn.textContent = '↺ Regenerate Summary';
+    btn.disabled = false;
+  } catch(e) {
+    box.innerHTML = '<div class="summary-label">AI Summary</div><span style="color:var(--accent-red)">Unable to generate summary. Check your API setup.</span>';
+    btn.textContent = '✦ Generate AI Summary';
+    btn.disabled = false;
+  }
+}
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 function renderAll() {
