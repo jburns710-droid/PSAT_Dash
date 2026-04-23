@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSAT/NMSQT Cohort Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --bg-card-hover: #243347;
+  --bg-input: #0b1220;
+  --bg-surface: #162032;
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --border-subtle: #334155;
+  --border-medium: #475569;
+
+  --accent-blue: #3b82f6;
+  --accent-blue-dim: rgba(59,130,246,0.15);
+  --accent-green: #22c55e;
+  --accent-green-dim: rgba(34,197,94,0.12);
+  --accent-yellow: #f59e0b;
+  --accent-yellow-dim: rgba(245,158,11,0.12);
+  --accent-red: #ef4444;
+  --accent-red-dim: rgba(239,68,68,0.12);
+  --accent-purple: #a78bfa;
+
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Source Sans 3", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-title .logo-badge {
+  background: var(--accent-blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.app-title h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.header-meta .grade-filter {
+  display: flex;
+  gap: var(--space-2);
+}
+.grade-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.grade-btn.active, .grade-btn:hover {
+  background: var(--accent-blue-dim);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* NAV TABS */
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 var(--space-6);
+}
+.nav-tab {
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+}
+.nav-tab:hover { color: var(--text-primary); }
+.nav-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* MAIN LAYOUT */
+.main {
+  padding: var(--space-5) var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.card-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* TAGS */
+.tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.tag-critical { background: var(--accent-red-dim); color: var(--accent-red); }
+.tag-watch    { background: var(--accent-yellow-dim); color: var(--accent-yellow); }
+.tag-strong   { background: var(--accent-green-dim); color: var(--accent-green); }
+.tag-blue     { background: var(--accent-blue-dim); color: var(--accent-blue); }
+
+/* TABS CONTENT */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.stat-bar {
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  margin-top: 10px;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* HEATMAP TABLE */
+.heatmap-container {
+  overflow-x: auto;
+}
+.heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.heatmap-table thead th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+}
+.heatmap-table tbody tr {
+  border-bottom: 1px solid rgba(51,65,85,0.5);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.heatmap-table tbody tr:hover { background: var(--bg-card-hover); }
+.heatmap-table td {
+  padding: 9px 10px;
+  white-space: nowrap;
+}
+.student-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.score-cell {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.domain-cell {
+  width: 60px;
+  text-align: center;
+}
+.band-pill {
+  display: inline-block;
+  width: 36px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+}
+
+/* band colors */
+.band-1 { background: rgba(239,68,68,0.25); color: #fca5a5; }
+.band-2 { background: rgba(239,68,68,0.15); color: #f87171; }
+.band-3 { background: rgba(245,158,11,0.15); color: #fcd34d; }
+.band-4 { background: rgba(245,158,11,0.1); color: #f59e0b; }
+.band-5 { background: rgba(34,197,94,0.1); color: #86efac; }
+.band-6 { background: rgba(34,197,94,0.15); color: #4ade80; }
+.band-7 { background: rgba(59,130,246,0.15); color: #93c5fd; }
+
+/* TIER SECTION */
+.tier-section { margin-bottom: var(--space-5); }
+.tier-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 2px;
+}
+.tier-header:hover { background: var(--bg-card-hover); }
+.tier-header.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+.tier-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.tier-icon.t1 { background: var(--accent-red-dim); color: var(--accent-red); }
+.tier-icon.t2 { background: var(--accent-yellow-dim); color: var(--accent-yellow); }
+.tier-icon.t3 { background: var(--accent-green-dim); color: var(--accent-green); }
+.tier-meta { flex: 1; }
+.tier-title { font-size: 15px; font-weight: 600; }
+.tier-desc { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+.tier-count {
+  font-size: 24px;
+  font-weight: 700;
+  padding-right: 12px;
+}
+.tier-toggle {
+  color: var(--text-muted);
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+.tier-toggle.open { transform: rotate(180deg); }
+
+.tier-body {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+  padding: var(--space-4);
+}
+.tier-body.open { display: block; }
+
+.student-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.student-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.student-card:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-card-hover);
+}
+.sc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.sc-name { font-size: 14px; font-weight: 600; }
+.sc-grade { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+.sc-total { font-size: 22px; font-weight: 700; }
+.sc-bars { margin-top: 10px; }
+.sc-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.sc-bar-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: 30px;
+  flex-shrink: 0;
+}
+.sc-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+.sc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.sc-score-val {
+  font-size: 12px;
+  font-weight: 600;
+  width: 30px;
+  text-align: right;
+}
+.bench-line {
+  position: relative;
+}
+.bench-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 13px;
+  background: var(--text-muted);
+  border-radius: 1px;
+}
+
+/* INDIVIDUAL PROFILE */
+.profile-selector {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+.profile-selector label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.profile-selector select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  min-width: 220px;
+}
+.profile-selector select:focus { border-color: var(--accent-blue); }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-5);
+}
+.profile-score-panel {}
+.score-big {
+  text-align: center;
+  padding: var(--space-5);
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 14px;
+}
+.score-big .total { font-size: 52px; font-weight: 700; line-height: 1; }
+.score-big .total-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.score-big .sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+.score-section {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--border-subtle);
+}
+.score-section .sec-val { font-size: 26px; font-weight: 700; }
+.score-section .sec-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.score-section .sec-bench { font-size: 11px; margin-top: 5px; }
+
+.benchmark-status {
+  padding: 14px;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 14px;
+}
+.bm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(51,65,85,0.5);
+}
+.bm-row:last-child { border-bottom: none; }
+.bm-area { font-size: 13px; }
+.bm-status { font-size: 12px; font-weight: 600; }
+.met { color: var(--accent-green); }
+.not-met { color: var(--accent-red); }
+.approaching { color: var(--accent-yellow); }
+
+/* DOMAIN BARS */
+.domains-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.domain-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+}
+.domain-card .dom-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.domain-card .dom-section { font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; }
+.dom-bar-track {
+  height: 8px;
+  background: var(--border-subtle);
+  border-radius: 4px;
+  position: relative;
+  margin-bottom: 6px;
+}
+.dom-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+.dom-range {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.dom-pct { font-size: 11px; color: var(--text-secondary); }
+
+/* GROWTH CHART */
+.growth-chart-wrap {
+  margin-top: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.growth-chart {
+  width: 100%;
+  height: 160px;
+}
+
+/* GROUPING TOOL */
+.grouping-controls {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.control-group { display: flex; flex-direction: column; gap: 5px; }
+.control-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.control-group select, .control-group input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  outline: none;
+  min-width: 180px;
+}
+.control-group select:focus, .control-group input:focus { border-color: var(--accent-blue); }
+.run-btn {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: flex-end;
+}
+.run-btn:hover { background: #2563eb; }
+
+.group-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+.group-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.group-card-header {
+  padding: 12px var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.group-name { font-size: 14px; font-weight: 600; }
+.group-focus { font-size: 12px; color: var(--text-secondary); }
+.group-count { font-size: 20px; font-weight: 700; }
+.group-body { padding: var(--space-4); }
+.group-student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(51,65,85,0.4);
+  font-size: 13px;
+}
+.group-student-row:last-child { border-bottom: none; }
+.gs-name { font-weight: 500; }
+.gs-score { font-weight: 600; color: var(--text-secondary); }
+.gs-flag { font-size: 11px; }
+
+/* MINI BAR HORIZONTAL */
+.mini-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border-subtle);
+  margin-top: 8px;
+}
+.mini-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* SECTION DIVIDERS */
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ATTENDANCE */
+.att-bar-track {
+  height: 8px;
+  background: var(--border-subtle);
+  border-radius: 4px;
+  position: relative;
+}
+.att-bar-fill { height: 100%; border-radius: 4px; }
+.att-threshold {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  background: var(--accent-red);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+.chronic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 5px;
+  background: rgba(239,68,68,0.15);
+  color: var(--accent-red);
+  letter-spacing: 0.02em;
+}
+.att-student-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 100px 120px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(51,65,85,0.5);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-radius: 4px;
+}
+.att-student-row:hover { background: var(--bg-card-hover); }
+.att-student-row:last-child { border-bottom: none; }
+.att-col-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 100px 120px;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+}
+.att-bar-wrap { width: 100%; }
+
+/* Collapsible domain columns */
+.domain-col { transition: opacity 0.2s; }
+.domains-hidden .domain-col { display: none; }
+
+.toggle-domains-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.toggle-domains-btn:hover, .toggle-domains-btn.active {
+  background: var(--accent-blue-dim);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(3, 1fr); }
+  .profile-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .main { padding: var(--space-4); }
+  .nav-tabs { overflow-x: auto; padding: 0 var(--space-4); }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-panel.active { animation: fadeIn 0.2s ease; }
+
+.highlight-bench { color: var(--accent-yellow); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-title">
+    <span class="logo-badge">PSAT</span>
+    <h1>Cohort Dashboard &mdash; Fall 2025</h1>
+  </div>
+  <div class="header-meta">
+    <div class="grade-filter">
+      <button class="grade-btn active" onclick="setGradeFilter('all', this)">All Grades</button>
+      <button class="grade-btn" onclick="setGradeFilter('10', this)">Grade 10</button>
+      <button class="grade-btn" onclick="setGradeFilter('11', this)">Grade 11</button>
+    </div>
+    <span id="header-count" style="font-size:13px; color: var(--text-secondary);">20 students</span>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('overview', this)">Cohort Overview</button>
+  <button class="nav-tab" onclick="showTab('tiers', this)">Tier Groups</button>
+  <button class="nav-tab" onclick="showTab('profile', this)">Individual Profile</button>
+  <button class="nav-tab" onclick="showTab('attendance', this)">Attendance</button>
+  <button class="nav-tab" onclick="showTab('grouping', this)">Flex Grouping</button>
+</nav>
+
+<main class="main">
+
+  <!-- TAB: OVERVIEW -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Cohort Score Heatmap</div>
+          <div class="card-subtitle">Click a student row to open their profile &nbsp;·&nbsp; Domain bands 1–7 (1 = lowest, 7 = highest)</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button class="toggle-domains-btn" id="domain-toggle-btn" onclick="toggleDomainCols()">▸ Show Domains</button>
+          <span class="tag tag-critical">Band 1–2</span>
+          <span class="tag tag-watch">Band 3–4</span>
+          <span class="tag tag-strong">Band 5–7</span>
+        </div>
+      </div>
+      <div class="heatmap-container">
+        <table class="heatmap-table domains-hidden" id="heatmap-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Gr</th>
+              <th style="text-align:center">RW</th>
+              <th style="text-align:center">Math</th>
+              <th style="text-align:center">Total</th>
+              <th style="text-align:center">Idx</th>
+              <th class="domain-col" style="text-align:center" title="Information & Ideas">I&amp;I</th>
+              <th class="domain-col" style="text-align:center" title="Craft & Structure">C&amp;S</th>
+              <th class="domain-col" style="text-align:center" title="Expression of Ideas">EoI</th>
+              <th class="domain-col" style="text-align:center" title="Standard English Conventions">SEC</th>
+              <th class="domain-col" style="text-align:center" title="Algebra">Alg</th>
+              <th class="domain-col" style="text-align:center" title="Advanced Math">AdvM</th>
+              <th class="domain-col" style="text-align:center" title="Problem Solving & Data Analysis">PS&amp;D</th>
+              <th class="domain-col" style="text-align:center" title="Geometry & Trig">G&amp;T</th>
+              <th>RW Bench</th>
+              <th>Math Bench</th>
+            </tr>
+          </thead>
+          <tbody id="heatmap-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: TIERS -->
+  <div class="tab-panel" id="tab-tiers">
+    <div id="tier-container"></div>
+  </div>
+
+  <!-- TAB: PROFILE -->
+  <div class="tab-panel" id="tab-profile">
+    <div class="profile-selector">
+      <label>Select Student:</label>
+      <select id="profile-select" onchange="renderProfile(this.value)"></select>
+    </div>
+    <div id="profile-content"></div>
+  </div>
+
+  <!-- TAB: ATTENDANCE -->
+  <div class="tab-panel" id="tab-attendance">
+    <div class="stats-row" id="att-stats-row" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Attendance — Cohort View</div>
+          <div class="card-subtitle">Chronic absenteeism = 10%+ of instructional days missed &nbsp;·&nbsp; Based on 180-day school year</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="att-sort" onchange="renderAttendance()" style="background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary);font-family:inherit;font-size:12px;padding:4px 10px;border-radius:5px;outline:none;">
+            <option value="absences">Sort: Most Absent</option>
+            <option value="name">Sort: Name</option>
+            <option value="pct">Sort: % Absent</option>
+          </select>
+          <span class="chronic-badge">⚠ Chronic = 18+ days</span>
+        </div>
+      </div>
+      <div class="att-col-header">
+        <span>Student</span>
+        <span style="text-align:center">Days Absent</span>
+        <span style="text-align:center">% Absent</span>
+        <span style="text-align:center">Status</span>
+        <span>Visual</span>
+      </div>
+      <div id="att-tbody"></div>
+    </div>
+  </div>
+
+  <!-- TAB: GROUPING -->
+  <div class="tab-panel" id="tab-grouping">
+    <div class="grouping-controls">
+      <div class="control-group">
+        <label>Focus Area</label>
+        <select id="group-domain">
+          <option value="rw">Reading &amp; Writing (Total)</option>
+          <option value="math">Math (Total)</option>
+          <option value="total">Total Score</option>
+          <option value="ii">RW: Information &amp; Ideas</option>
+          <option value="cs">RW: Craft &amp; Structure</option>
+          <option value="eoi">RW: Expression of Ideas</option>
+          <option value="sec">RW: Standard English</option>
+          <option value="alg">Math: Algebra</option>
+          <option value="advm">Math: Advanced Math</option>
+          <option value="psd">Math: Problem Solving &amp; Data</option>
+          <option value="gt">Math: Geometry &amp; Trig</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Group Size</label>
+        <select id="group-size">
+          <option value="4">4 students/group</option>
+          <option value="5" selected>5 students/group</option>
+          <option value="6">6 students/group</option>
+          <option value="8">8 students/group</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Mode</label>
+        <select id="group-mode">
+          <option value="similar">Similar Levels (intervention groups)</option>
+          <option value="mixed">Mixed Levels (peer support)</option>
+        </select>
+      </div>
+      <button class="run-btn" onclick="runGrouping()">Generate Groups</button>
+    </div>
+    <div id="group-results"></div>
+  </div>
+
+</main>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const DOMAINS_RW = ['ii','cs','eoi','sec'];
+const DOMAINS_MATH = ['alg','advm','psd','gt'];
+const DOMAIN_LABELS = {
+  ii: 'Info & Ideas', cs: 'Craft & Structure',
+  eoi: 'Expression of Ideas', sec: 'Standard English',
+  alg: 'Algebra', advm: 'Advanced Math',
+  psd: 'Problem Solving & Data', gt: 'Geometry & Trig'
+};
+const BENCHMARKS = {
+  10: { rw: 430, math: 480 },
+  11: { rw: 460, math: 510 }
+};
+
+// Band midpoints for domain score estimation
+// Bands 1–7 mapped roughly to score range 160–760 in 6 steps
+const BAND_RANGES = {
+  1: [160, 280], 2: [280, 370], 3: [370, 440],
+  4: [440, 520], 5: [520, 590], 6: [590, 660], 7: [660, 760]
+};
+function bandMid(b) { const r = BAND_RANGES[b]; return Math.round((r[0]+r[1])/2); }
+
+function scoreToColor(score, section='rw') {
+  const pct = (score - 160) / (760 - 160);
+  if (pct < 0.25) return 'var(--accent-red)';
+  if (pct < 0.45) return 'var(--accent-yellow)';
+  return 'var(--accent-green)';
+}
+
+const STUDENTS = [
+  { id: 1,  name: 'Aaliyah Torres',    grade: 11, rw: 620, math: 500, absences: 4,  domains: { ii:6,cs:5,eoi:5,sec:6, alg:5,advm:4,psd:5,gt:4 } },
+  { id: 2,  name: 'Ben Kowalski',      grade: 11, rw: 480, math: 470, absences: 11, domains: { ii:4,cs:4,eoi:3,sec:4, alg:4,advm:3,psd:4,gt:3 } },
+  { id: 3,  name: 'Carmen Rivera',     grade: 10, rw: 390, math: 420, absences: 22, domains: { ii:3,cs:3,eoi:2,sec:3, alg:3,advm:3,psd:2,gt:3 } },
+  { id: 4,  name: 'Dante Williams',    grade: 11, rw: 540, math: 560, absences: 2,  domains: { ii:5,cs:5,eoi:5,sec:5, alg:6,advm:5,psd:5,gt:5 } },
+  { id: 5,  name: 'Elise Nguyen',      grade: 10, rw: 450, math: 390, absences: 19, domains: { ii:4,cs:3,eoi:4,sec:4, alg:3,advm:2,psd:3,gt:2 } },
+  { id: 6,  name: 'Felix Okonkwo',     grade: 11, rw: 360, math: 340, absences: 31, domains: { ii:2,cs:2,eoi:3,sec:2, alg:2,advm:2,psd:2,gt:1 } },
+  { id: 7,  name: 'Grace Kim',         grade: 10, rw: 690, math: 680, absences: 1,  domains: { ii:7,cs:7,eoi:6,sec:7, alg:7,advm:6,psd:7,gt:6 } },
+  { id: 8,  name: 'Harrison Blake',    grade: 11, rw: 410, math: 430, absences: 14, domains: { ii:3,cs:3,eoi:3,sec:4, alg:3,advm:3,psd:4,gt:3 } },
+  { id: 9,  name: 'Imani Johnson',     grade: 10, rw: 520, math: 510, absences: 6,  domains: { ii:5,cs:4,eoi:5,sec:5, alg:5,advm:5,psd:4,gt:5 } },
+  { id: 10, name: 'Jared Patel',       grade: 11, rw: 580, math: 530, absences: 8,  domains: { ii:5,cs:6,eoi:5,sec:5, alg:5,advm:5,psd:5,gt:4 } },
+  { id: 11, name: 'Kyla Marchetti',    grade: 10, rw: 320, math: 310, absences: 27, domains: { ii:2,cs:1,eoi:2,sec:2, alg:1,advm:1,psd:2,gt:1 } },
+  { id: 12, name: 'Liam Osei',         grade: 11, rw: 650, math: 610, absences: 3,  domains: { ii:6,cs:6,eoi:6,sec:6, alg:6,advm:6,psd:6,gt:5 } },
+  { id: 13, name: 'Maia Ferreira',     grade: 10, rw: 470, math: 460, absences: 9,  domains: { ii:4,cs:4,eoi:4,sec:4, alg:4,advm:3,psd:4,gt:4 } },
+  { id: 14, name: 'Noah Steinberg',    grade: 11, rw: 500, math: 490, absences: 16, domains: { ii:4,cs:5,eoi:4,sec:5, alg:4,advm:4,psd:5,gt:4 } },
+  { id: 15, name: 'Olivia Chandra',    grade: 10, rw: 560, math: 540, absences: 5,  domains: { ii:5,cs:5,eoi:5,sec:6, alg:5,advm:5,psd:5,gt:5 } },
+  { id: 16, name: 'Priya Sundaram',    grade: 11, rw: 430, math: 400, absences: 20, domains: { ii:3,cs:4,eoi:3,sec:3, alg:3,advm:2,psd:3,gt:3 } },
+  { id: 17, name: 'Quinn Delacroix',   grade: 10, rw: 380, math: 350, absences: 18, domains: { ii:2,cs:3,eoi:2,sec:2, alg:2,advm:2,psd:2,gt:2 } },
+  { id: 18, name: 'Rashida Abboud',    grade: 11, rw: 600, math: 580, absences: 7,  domains: { ii:6,cs:5,eoi:6,sec:6, alg:6,advm:5,psd:5,gt:6 } },
+  { id: 19, name: 'Sam Lockwood',      grade: 10, rw: 490, math: 480, absences: 12, domains: { ii:4,cs:4,eoi:5,sec:4, alg:5,advm:4,psd:4,gt:4 } },
+  { id: 20, name: 'Tessa Vann',        grade: 11, rw: 340, math: 320, absences: 24, domains: { ii:2,cs:2,eoi:2,sec:1, alg:2,advm:1,psd:2,gt:2 } },
+];
+
+STUDENTS.forEach(s => {
+  s.total = s.rw + s.math;
+  s.idx = Math.round((2 * s.rw + s.math) / 10);
+  const bm = BENCHMARKS[s.grade];
+  s.rwMet = s.rw >= bm.rw;
+  s.mathMet = s.math >= bm.math;
+  const metCount = (s.rwMet ? 1 : 0) + (s.mathMet ? 1 : 0);
+  if (metCount === 2) s.tier = 3;
+  else if (metCount === 1) s.tier = 2;
+  else s.tier = 1;
+  // Attendance
+  s.absPct = Math.round(s.absences / 180 * 100);
+  s.chronic = s.absences >= 18; // 10% of 180
+});
+
+let gradeFilter = 'all';
+
+function filteredStudents() {
+  if (gradeFilter === 'all') return STUDENTS;
+  return STUDENTS.filter(s => String(s.grade) === gradeFilter);
+}
+
+// ─── GRADE FILTER ────────────────────────────────────────────────────────────
+function setGradeFilter(g, btn) {
+  gradeFilter = g;
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const fs = filteredStudents();
+  document.getElementById('header-count').textContent = `${fs.length} students`;
+  renderAll();
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'attendance') renderAttendance();
+}
+
+// ─── STATS ROW ───────────────────────────────────────────────────────────────
+function renderStats() {
+  const fs = filteredStudents();
+  const avgTotal = Math.round(fs.reduce((a,s)=>a+s.total,0)/fs.length);
+  const avgRW = Math.round(fs.reduce((a,s)=>a+s.rw,0)/fs.length);
+  const avgMath = Math.round(fs.reduce((a,s)=>a+s.math,0)/fs.length);
+  const t1 = fs.filter(s=>s.tier===1).length;
+  const t2 = fs.filter(s=>s.tier===2).length;
+  const t3 = fs.filter(s=>s.tier===3).length;
+  const bothMet = fs.filter(s=>s.rwMet&&s.mathMet).length;
+  const pct = n => Math.round(n/fs.length*100);
+
+  const stats = [
+    { label: 'Avg Total', val: avgTotal, sub: `Range 320–1520`, bar: (avgTotal-320)/1200, color: scoreToColor(avgTotal) },
+    { label: 'Avg RW', val: avgRW, sub: `Range 160–760`, bar: (avgRW-160)/600, color: scoreToColor(avgRW,'rw') },
+    { label: 'Avg Math', val: avgMath, sub: `Range 160–760`, bar: (avgMath-160)/600, color: scoreToColor(avgMath,'math') },
+    { label: 'Both Benchmarks Met', val: `${bothMet}/${fs.length}`, sub: `${pct(bothMet)}% college ready`, bar: bothMet/fs.length, color: 'var(--accent-green)' },
+    { label: 'Needs Support (T1)', val: `${t1}/${fs.length}`, sub: `${pct(t1)}% below both benchmarks`, bar: t1/fs.length, color: 'var(--accent-red)' },
+  ];
+
+  document.getElementById('stats-row').innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.val}</div>
+      <div class="stat-sub">${s.sub}</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.round(s.bar*100)}%;background:${s.color}"></div></div>
+    </div>
+  `).join('');
+}
+
+// ─── HEATMAP DOMAIN TOGGLE ────────────────────────────────────────────────────
+let domainsVisible = false;
+function toggleDomainCols() {
+  domainsVisible = !domainsVisible;
+  const table = document.getElementById('heatmap-table');
+  const btn = document.getElementById('domain-toggle-btn');
+  table.classList.toggle('domains-hidden', !domainsVisible);
+  btn.classList.toggle('active', domainsVisible);
+  btn.textContent = domainsVisible ? '▾ Hide Domains' : '▸ Show Domains';
+}
+
+// ─── HEATMAP ─────────────────────────────────────────────────────────────────
+function bandClass(b) {
+  if (b <= 2) return 'band-' + b;
+  if (b <= 4) return 'band-' + b;
+  return 'band-' + b;
+}
+
+function renderHeatmap() {
+  const fs = filteredStudents();
+  const sorted = [...fs].sort((a,b) => b.total - a.total);
+  const tbody = document.getElementById('heatmap-tbody');
+  const bm_cols = ['ii','cs','eoi','sec','alg','advm','psd','gt'];
+
+  tbody.innerHTML = sorted.map(s => {
+    const bm = BENCHMARKS[s.grade];
+    const rwStatus = s.rwMet ? '<span class="tag tag-strong">✓</span>' : s.rw >= bm.rw - 30 ? '<span class="tag tag-watch">Near</span>' : '<span class="tag tag-critical">✗</span>';
+    const mStatus = s.mathMet ? '<span class="tag tag-strong">✓</span>' : s.math >= bm.math - 30 ? '<span class="tag tag-watch">Near</span>' : '<span class="tag tag-critical">✗</span>';
+    const domCells = bm_cols.map(d => `<td class="domain-cell domain-col"><span class="band-pill band-${s.domains[d]}">${s.domains[d]}</span></td>`).join('');
+    const tierColor = s.tier === 1 ? 'var(--accent-red)' : s.tier === 2 ? 'var(--accent-yellow)' : 'var(--accent-green)';
+    return `<tr onclick="openProfile(${s.id})">
+      <td><span class="student-name">${s.name}</span></td>
+      <td><span style="font-size:13px;color:var(--text-secondary)">${s.grade}</span></td>
+      <td class="score-cell" style="color:${scoreToColor(s.rw)}">${s.rw}</td>
+      <td class="score-cell" style="color:${scoreToColor(s.math)}">${s.math}</td>
+      <td class="score-cell" style="color:${scoreToColor(s.total)};font-size:15px">${s.total}</td>
+      <td class="score-cell" style="color:var(--text-secondary)">${s.idx}</td>
+      ${domCells}
+      <td>${rwStatus}</td>
+      <td>${mStatus}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── TIERS ───────────────────────────────────────────────────────────────────
+function renderTiers() {
+  const fs = filteredStudents();
+  const tiers = [
+    { num: 1, icon: 'T1', cls: 't1', title: 'Intensive Support', desc: 'Below both benchmarks — both RW and Math need attention', tag: 'tag-critical' },
+    { num: 2, icon: 'T2', cls: 't2', title: 'Strategic Support', desc: 'Below one benchmark — targeted skill work needed', tag: 'tag-watch' },
+    { num: 3, icon: 'T3', cls: 't3', title: 'On Track / Extend', desc: 'Meeting both benchmarks — acceleration opportunities', tag: 'tag-strong' },
+  ];
+
+  document.getElementById('tier-container').innerHTML = tiers.map(t => {
+    const students = fs.filter(s => s.tier === t.num).sort((a,b) => a.total - b.total);
+    return `
+    <div class="tier-section">
+      <div class="tier-header" id="tier-hdr-${t.num}" onclick="toggleTier(${t.num})">
+        <div class="tier-icon ${t.cls}">${t.icon}</div>
+        <div class="tier-meta">
+          <div class="tier-title">${t.title}</div>
+          <div class="tier-desc">${t.desc}</div>
+        </div>
+        <div class="tier-count" style="color:${t.num===1?'var(--accent-red)':t.num===2?'var(--accent-yellow)':'var(--accent-green)'}">${students.length}</div>
+        <span class="tier-toggle" id="tier-tog-${t.num}">▾</span>
+      </div>
+      <div class="tier-body" id="tier-body-${t.num}">
+        <div class="student-cards">
+          ${students.map(s => {
+            const bm = BENCHMARKS[s.grade];
+            const rwPct = Math.round((s.rw-160)/600*100);
+            const mPct = Math.round((s.math-160)/600*100);
+            const rwBenchPct = Math.round((bm.rw-160)/600*100);
+            const mBenchPct = Math.round((bm.math-160)/600*100);
+            return `<div class="student-card" onclick="openProfile(${s.id})">
+              <div class="sc-header">
+                <div><div class="sc-name">${s.name}</div><div class="sc-grade">Grade ${s.grade}</div></div>
+                <div style="text-align:right"><div class="sc-total" style="color:${scoreToColor(s.total)}">${s.total}</div><div style="font-size:11px;color:var(--text-secondary)">Total</div></div>
+              </div>
+              <div class="sc-bars">
+                <div class="sc-bar-row">
+                  <span class="sc-bar-label" style="font-size:11px">RW</span>
+                  <div class="sc-bar-track bench-line">
+                    <div class="sc-bar-fill" style="width:${rwPct}%;background:${scoreToColor(s.rw)}"></div>
+                    <div class="bench-marker" style="left:${rwBenchPct}%" title="Benchmark: ${bm.rw}"></div>
+                  </div>
+                  <span class="sc-score-val" style="color:${scoreToColor(s.rw)}">${s.rw}</span>
+                </div>
+                <div class="sc-bar-row">
+                  <span class="sc-bar-label" style="font-size:11px">Math</span>
+                  <div class="sc-bar-track bench-line">
+                    <div class="sc-bar-fill" style="width:${mPct}%;background:${scoreToColor(s.math)}"></div>
+                    <div class="bench-marker" style="left:${mBenchPct}%" title="Benchmark: ${bm.math}"></div>
+                  </div>
+                  <span class="sc-score-val" style="color:${scoreToColor(s.math)}">${s.math}</span>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleTier(n) {
+  const body = document.getElementById('tier-body-' + n);
+  const tog = document.getElementById('tier-tog-' + n);
+  const hdr = document.getElementById('tier-hdr-' + n);
+  body.classList.toggle('open');
+  tog.classList.toggle('open');
+  hdr.classList.toggle('open');
+}
+
+// ─── PROFILE ─────────────────────────────────────────────────────────────────
+function renderProfileSelect() {
+  const sel = document.getElementById('profile-select');
+  sel.innerHTML = [...STUDENTS].sort((a,b)=>a.name.localeCompare(b.name)).map(s =>
+    `<option value="${s.id}">${s.name} (Gr. ${s.grade})</option>`
+  ).join('');
+  renderProfile(sel.value);
+}
+
+function openProfile(id) {
+  showTab('profile', document.querySelectorAll('.nav-tab')[2]);
+  document.getElementById('profile-select').value = id;
+  renderProfile(id);
+}
+
+function renderProfile(id) {
+  const s = STUDENTS.find(x => x.id == id);
+  if (!s) return;
+  const bm = BENCHMARKS[s.grade];
+
+  const allDomains = [
+    ...DOMAINS_RW.map(d => ({key:d, label:DOMAIN_LABELS[d], section:'Reading & Writing'})),
+    ...DOMAINS_MATH.map(d => ({key:d, label:DOMAIN_LABELS[d], section:'Math'}))
+  ];
+
+  const domColors = (band) => {
+    if (band <= 2) return 'var(--accent-red)';
+    if (band <= 4) return 'var(--accent-yellow)';
+    return 'var(--accent-green)';
+  };
+
+  const tierLabel = s.tier === 1
+    ? '<span class="tag tag-critical">Intensive Support</span>'
+    : s.tier === 2
+    ? '<span class="tag tag-watch">Strategic Support</span>'
+    : '<span class="tag tag-strong">On Track</span>';
+
+  // Always show both sections — criterion first, then relative fallback
+  const bandsSorted = [...allDomains].sort((a,b) => s.domains[b.key] - s.domains[a.key]);
+  const criterionStrong = allDomains.filter(d => s.domains[d.key] >= 6);
+  const criterionWeak   = allDomains.filter(d => s.domains[d.key] <= 3);
+
+  // Relative: top 3 / bottom 3 by band value (used when criterion list is empty)
+  const relStrong = bandsSorted.slice(0, 3);
+  const relWeak   = bandsSorted.slice(-3).reverse();
+
+  const strengthList = criterionStrong.length ? criterionStrong : relStrong;
+  const focusList    = criterionWeak.length   ? criterionWeak   : relWeak;
+  const strengthNote = criterionStrong.length ? '' : '<span style="font-size:11px;color:var(--text-muted);margin-left:6px">(relative)</span>';
+  const focusNote    = criterionWeak.length   ? '' : '<span style="font-size:11px;color:var(--text-muted);margin-left:6px">(relative)</span>';
+
+  // Attendance
+  const attColor = s.chronic ? 'var(--accent-red)' : s.absences >= 10 ? 'var(--accent-yellow)' : 'var(--accent-green)';
+  const attStatus = s.chronic ? 'Chronically Absent' : s.absences >= 10 ? 'Approaching Chronic' : 'On Track';
+  const attPct = Math.round(s.absences / 180 * 100);
+
+  document.getElementById('profile-content').innerHTML = `
+    <div class="profile-grid">
+      <div class="profile-score-panel">
+        <div class="score-big">
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">${s.name} &nbsp;·&nbsp; Grade ${s.grade} &nbsp;·&nbsp; ${tierLabel}</div>
+          <div class="total" style="color:${scoreToColor(s.total)}">${s.total}</div>
+          <div class="total-label">Total Score (320–1520)</div>
+          <div class="sections">
+            <div class="score-section">
+              <div class="sec-val" style="color:${scoreToColor(s.rw)}">${s.rw}</div>
+              <div class="sec-label">Reading & Writing</div>
+              <div class="sec-bench" style="color:${s.rwMet?'var(--accent-green)':'var(--accent-red)'}">
+                ${s.rwMet ? '✓ Met' : '✗ Not Met'} (${bm.rw})
+              </div>
+            </div>
+            <div class="score-section">
+              <div class="sec-val" style="color:${scoreToColor(s.math)}">${s.math}</div>
+              <div class="sec-label">Math</div>
+              <div class="sec-bench" style="color:${s.mathMet?'var(--accent-green)':'var(--accent-red)'}">
+                ${s.mathMet ? '✓ Met' : '✗ Not Met'} (${bm.math})
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:var(--text-secondary)">Selection Index: <strong style="color:var(--text-primary);font-size:16px">${s.idx}</strong> <span style="color:var(--text-muted)">(48–228)</span></div>
+        </div>
+
+        <div class="benchmark-status">
+          <div class="section-label">Benchmark Status — Grade ${s.grade}</div>
+          <div class="bm-row">
+            <span class="bm-area">Reading & Writing</span>
+            <span class="bm-status ${s.rwMet?'met':s.rw>=bm.rw-30?'approaching':'not-met'}">
+              ${s.rwMet ? `✓ Met (${s.rw} ≥ ${bm.rw})` : s.rw >= bm.rw - 30 ? `≈ Approaching (${s.rw}, need ${bm.rw-s.rw} more)` : `✗ Below (${s.rw} vs ${bm.rw})`}
+            </span>
+          </div>
+          <div class="bm-row">
+            <span class="bm-area">Math</span>
+            <span class="bm-status ${s.mathMet?'met':s.math>=bm.math-30?'approaching':'not-met'}">
+              ${s.mathMet ? `✓ Met (${s.math} ≥ ${bm.math})` : s.math >= bm.math - 30 ? `≈ Approaching (${s.math}, need ${bm.math-s.math} more)` : `✗ Below (${s.math} vs ${bm.math})`}
+            </span>
+          </div>
+        </div>
+
+        <!-- ALWAYS-PRESENT STRENGTHS -->
+        <div class="card" style="margin-bottom:14px;border-color:rgba(34,197,94,0.25)">
+          <div class="section-label" style="color:var(--accent-green);display:flex;align-items:center">Strength Areas ${strengthNote}</div>
+          ${strengthList.map(d => {
+            const b = s.domains[d.key];
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.4)">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">✦ ${d.label}</div>
+                <div style="font-size:11px;color:var(--text-secondary)">${d.section}</div>
+              </div>
+              <span class="band-pill band-${b}" style="flex-shrink:0">Band ${b}</span>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- ALWAYS-PRESENT FOCUS AREAS -->
+        <div class="card" style="margin-bottom:14px;border-color:rgba(239,68,68,0.25)">
+          <div class="section-label" style="color:var(--accent-red);display:flex;align-items:center">Priority Focus Areas ${focusNote}</div>
+          ${focusList.map(d => {
+            const b = s.domains[d.key];
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(51,65,85,0.4)">
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">▸ ${d.label}</div>
+                <div style="font-size:11px;color:var(--text-secondary)">${d.section}</div>
+              </div>
+              <span class="band-pill band-${b}" style="flex-shrink:0">Band ${b}</span>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- ATTENDANCE PANEL -->
+        <div class="card" style="border-color:${s.chronic?'rgba(239,68,68,0.3)':s.absences>=10?'rgba(245,158,11,0.2)':'rgba(34,197,94,0.15)'}">
+          <div class="section-label">Attendance</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-size:26px;font-weight:700;color:${attColor};line-height:1">${s.absences}</div>
+              <div style="font-size:12px;color:var(--text-secondary)">days absent of 180</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:${attColor}">${attPct}%</div>
+              ${s.chronic ? '<span class="chronic-badge">⚠ Chronic</span>' : `<span style="font-size:12px;color:${attColor};font-weight:600">${attStatus}</span>`}
+            </div>
+          </div>
+          <div class="att-bar-track">
+            <div class="att-bar-fill" style="width:${Math.min(attPct*2.5,100)}%;background:${attColor}"></div>
+            <div class="att-threshold" style="left:10%" title="Chronic threshold: 18 days (10%)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px">
+            <span>0 days</span>
+            <span style="color:var(--accent-red);font-weight:600">⬆ 18 days = chronic</span>
+            <span>40+ days</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><div class="card-title">Domain Performance Bands</div><div style="font-size:12px;color:var(--text-secondary)">Band 1 (lowest) → 7 (highest)</div></div>
+          <div style="margin-bottom:10px"><div class="section-label">Reading & Writing</div>
+          <div class="domains-panel">
+            ${DOMAINS_RW.map(d => {
+              const band = s.domains[d];
+              const range = BAND_RANGES[band];
+              const fillPct = Math.round((band-1)/6*100);
+              return `<div class="domain-card">
+                <div class="dom-label">${DOMAIN_LABELS[d]}</div>
+                <div class="dom-section">Reading & Writing</div>
+                <div class="dom-bar-track">
+                  <div class="dom-bar-fill" style="width:${fillPct}%;background:${domColors(band)}"></div>
+                </div>
+                <span class="dom-range">Band ${band}</span> <span class="dom-pct">&nbsp;~${range[0]}–${range[1]}</span>
+              </div>`;
+            }).join('')}
+          </div></div>
+          <div><div class="section-label">Math</div>
+          <div class="domains-panel">
+            ${DOMAINS_MATH.map(d => {
+              const band = s.domains[d];
+              const range = BAND_RANGES[band];
+              const fillPct = Math.round((band-1)/6*100);
+              return `<div class="domain-card">
+                <div class="dom-label">${DOMAIN_LABELS[d]}</div>
+                <div class="dom-section">Math</div>
+                <div class="dom-bar-track">
+                  <div class="dom-bar-fill" style="width:${fillPct}%;background:${domColors(band)}"></div>
+                </div>
+                <span class="dom-range">Band ${band}</span> <span class="dom-pct">&nbsp;~${range[0]}–${range[1]}</span>
+              </div>`;
+            }).join('')}
+          </div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Score Context vs. Cohort</div>
+          </div>
+          ${renderCohortContext(s)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCohortContext(s) {
+  const fs = filteredStudents();
+  const sections = [
+    { label: 'Total Score', val: s.total, min: 320, max: 1520, cohortVals: fs.map(x=>x.total) },
+    { label: 'Reading & Writing', val: s.rw, min: 160, max: 760, cohortVals: fs.map(x=>x.rw) },
+    { label: 'Math', val: s.math, min: 160, max: 760, cohortVals: fs.map(x=>x.math) },
+  ];
+  return sections.map(sec => {
+    const sorted = [...sec.cohortVals].sort((a,b)=>a-b);
+    const rank = sorted.filter(v=>v<=sec.val).length;
+    const pctile = Math.round(rank/sorted.length*100);
+    const avg = Math.round(sec.cohortVals.reduce((a,b)=>a+b,0)/sec.cohortVals.length);
+    const valPct = Math.round((sec.val-sec.min)/(sec.max-sec.min)*100);
+    const avgPct = Math.round((avg-sec.min)/(sec.max-sec.min)*100);
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:13px;font-weight:600">${sec.label}</span>
+        <span style="font-size:13px;color:var(--text-secondary)">${pctile}th percentile in cohort</span>
+      </div>
+      <div style="position:relative;height:10px;background:var(--border-subtle);border-radius:5px;margin-bottom:4px">
+        <div style="position:absolute;left:0;height:100%;width:${valPct}%;background:${scoreToColor(sec.val)};border-radius:5px;"></div>
+        <div style="position:absolute;left:${avgPct}%;top:-5px;width:2px;height:20px;background:var(--text-muted);border-radius:1px;" title="Cohort avg: ${avg}"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)">
+        <span style="color:${scoreToColor(sec.val)};font-weight:600">${sec.val}</span>
+        <span>Cohort avg: ${avg}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── GROUPING ─────────────────────────────────────────────────────────────────
+function runGrouping() {
+  const domain = document.getElementById('group-domain').value;
+  const size = parseInt(document.getElementById('group-size').value);
+  const mode = document.getElementById('group-mode').value;
+  const fs = filteredStudents();
+
+  const getScore = (s) => {
+    const map = { rw:s.rw, math:s.math, total:s.total, ii:bandMid(s.domains.ii), cs:bandMid(s.domains.cs), eoi:bandMid(s.domains.eoi), sec:bandMid(s.domains.sec), alg:bandMid(s.domains.alg), advm:bandMid(s.domains.advm), psd:bandMid(s.domains.psd), gt:bandMid(s.domains.gt) };
+    return map[domain] || s.total;
+  };
+
+  const domainLabel = document.getElementById('group-domain').options[document.getElementById('group-domain').selectedIndex].text;
+
+  let sorted = [...fs].sort((a,b) => getScore(a) - getScore(b));
+  const groups = [];
+
+  if (mode === 'similar') {
+    for (let i = 0; i < sorted.length; i += size) {
+      groups.push(sorted.slice(i, i + size));
+    }
+  } else {
+    // Mixed: interleave top and bottom
+    const mixed = [];
+    let lo = 0, hi = sorted.length - 1;
+    while (lo <= hi) {
+      if (lo !== hi) { mixed.push(sorted[lo++]); mixed.push(sorted[hi--]); }
+      else { mixed.push(sorted[lo++]); }
+    }
+    for (let i = 0; i < mixed.length; i += size) {
+      groups.push(mixed.slice(i, i + size));
+    }
+  }
+
+  const colors = ['var(--accent-blue)','var(--accent-green)','var(--accent-yellow)','var(--accent-purple)','#fb923c','#22d3ee','#f472b6','#a3e635'];
+  const groupNames = ['Group A','Group B','Group C','Group D','Group E','Group F','Group G','Group H'];
+
+  document.getElementById('group-results').innerHTML = `
+    <div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">
+      ${groups.length} groups · Focus: <strong style="color:var(--text-primary)">${domainLabel}</strong> · Mode: <strong style="color:var(--text-primary)">${mode === 'similar' ? 'Similar levels' : 'Mixed levels'}</strong>
+    </div>
+    <div class="group-results">
+      ${groups.map((g, i) => {
+        const scores = g.map(s => getScore(s));
+        const avgScore = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+        const color = colors[i % colors.length];
+        return `<div class="group-card">
+          <div class="group-card-header" style="border-top: 3px solid ${color}">
+            <div>
+              <div class="group-name">${groupNames[i] || 'Group '+(i+1)}</div>
+              <div class="group-focus">Avg: ${avgScore}</div>
+            </div>
+            <div class="group-count" style="color:${color}">${g.length}</div>
+          </div>
+          <div class="group-body">
+            ${g.map(s => {
+              const sc = getScore(s);
+              const bm = BENCHMARKS[s.grade];
+              const flags = [];
+              if (!s.rwMet) flags.push('<span class="tag tag-critical" style="font-size:10px">RW</span>');
+              if (!s.mathMet) flags.push('<span class="tag tag-watch" style="font-size:10px">Math</span>');
+              return `<div class="group-student-row">
+                <div>
+                  <div class="gs-name">${s.name}</div>
+                  <div style="font-size:11px;color:var(--text-secondary)">Gr. ${s.grade} · T${s.tier}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  ${flags.join('')}
+                  <span class="gs-score" style="color:${scoreToColor(sc)}">${sc}</span>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ─── ATTENDANCE ───────────────────────────────────────────────────────────────
+function renderAttStats() {
+  const fs = filteredStudents();
+  const chronic = fs.filter(s => s.chronic).length;
+  const approaching = fs.filter(s => !s.chronic && s.absences >= 10).length;
+  const onTrack = fs.filter(s => s.absences < 10).length;
+  const avgAbs = (fs.reduce((a,s)=>a+s.absences,0)/fs.length).toFixed(1);
+
+  document.getElementById('att-stats-row').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Avg Days Absent</div>
+      <div class="stat-value">${avgAbs}</div>
+      <div class="stat-sub">of 180 school days</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.min(parseFloat(avgAbs)/40*100,100)}%;background:${parseFloat(avgAbs)>=18?'var(--accent-red)':parseFloat(avgAbs)>=10?'var(--accent-yellow)':'var(--accent-green)'}"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Chronically Absent</div>
+      <div class="stat-value" style="color:var(--accent-red)">${chronic}</div>
+      <div class="stat-sub">${Math.round(chronic/fs.length*100)}% of cohort · 18+ days</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.round(chronic/fs.length*100)}%;background:var(--accent-red)"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Approaching Chronic</div>
+      <div class="stat-value" style="color:var(--accent-yellow)">${approaching}</div>
+      <div class="stat-sub">${Math.round(approaching/fs.length*100)}% of cohort · 10–17 days</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.round(approaching/fs.length*100)}%;background:var(--accent-yellow)"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">On Track</div>
+      <div class="stat-value" style="color:var(--accent-green)">${onTrack}</div>
+      <div class="stat-sub">${Math.round(onTrack/fs.length*100)}% of cohort · under 10 days</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.round(onTrack/fs.length*100)}%;background:var(--accent-green)"></div></div>
+    </div>
+  `;
+}
+
+function renderAttendance() {
+  renderAttStats();
+  const fs = filteredStudents();
+  const sortVal = document.getElementById('att-sort') ? document.getElementById('att-sort').value : 'absences';
+  const sorted = [...fs].sort((a,b) => {
+    if (sortVal === 'name') return a.name.localeCompare(b.name);
+    if (sortVal === 'pct') return b.absPct - a.absPct;
+    return b.absences - a.absences;
+  });
+
+  document.getElementById('att-tbody').innerHTML = sorted.map(s => {
+    const attColor = s.chronic ? 'var(--accent-red)' : s.absences >= 10 ? 'var(--accent-yellow)' : 'var(--accent-green)';
+    const statusLabel = s.chronic ? '<span class="chronic-badge">⚠ Chronic</span>' : s.absences >= 10 ? '<span class="tag tag-watch">Approaching</span>' : '<span class="tag tag-strong">On Track</span>';
+    const barPct = Math.min(s.absences / 40 * 100, 100);
+    const threshPct = 18/40*100; // chronic threshold at 18 days, bar max=40
+    return `<div class="att-student-row" onclick="openProfile(${s.id})">
+      <div>
+        <div style="font-size:14px;font-weight:600">${s.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary)">Gr. ${s.grade} &nbsp;·&nbsp; T${s.tier} ${s.tier===1?'· <span style="color:var(--accent-red)">Below both benchmarks</span>':''}</div>
+      </div>
+      <div style="text-align:center;font-size:16px;font-weight:700;color:${attColor}">${s.absences}</div>
+      <div style="text-align:center;font-size:14px;font-weight:600;color:${attColor}">${s.absPct}%</div>
+      <div style="text-align:center">${statusLabel}</div>
+      <div class="att-bar-wrap">
+        <div class="att-bar-track">
+          <div class="att-bar-fill" style="width:${barPct}%;background:${attColor}"></div>
+          <div class="att-threshold" style="left:${threshPct}%" title="Chronic: 18 days"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStats();
+  renderHeatmap();
+  renderTiers();
+  renderAttStats();
+}
+
+renderAll();
+renderProfileSelect();
+
+// Open first tier by default
+setTimeout(() => { toggleTier(1); toggleTier(2); }, 100);
+</script>
+</body>
+</html>
